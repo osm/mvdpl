@@ -1,3 +1,3 @@
 # mvdpl
 
-Extract `updatepl` stats from an MVD demo.
+Extract `updateping` and `updatepl` stats from an MVD demo.

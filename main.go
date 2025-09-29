@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/osm/mvdpl/internal/fileutil"
+	"github.com/osm/mvdpl/internal/format"
 	"github.com/osm/mvdpl/internal/mvdparser"
 )
 
@@ -14,23 +16,21 @@ func main() {
 	}
 
 	mvdPath := os.Args[1]
-	mvdData, err := os.ReadFile(mvdPath)
+	mvdData, err := fileutil.ReadMVD(mvdPath)
 	if err != nil {
 		fmt.Printf("unable to open %v, %v\n", mvdPath, err)
 		os.Exit(1)
 	}
 
 	p := mvdparser.New()
-	packetLoss, err := p.Parse(mvdData)
+	events, err := p.Parse(mvdData)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error when parsing %v, %v\n", mvdPath, err)
 		os.Exit(1)
 	}
 
-	for _, pl := range packetLoss {
-		fmt.Printf("%s %s %d%% pl\n",
-			pl.Name,
-			fmt.Sprintf("%02d:%02d", pl.Timestamp/60, pl.Timestamp%60),
-			pl.Lossage)
+	for _, e := range events {
+		fmt.Printf("[%s] %s %d%s\n",
+			format.Time(e.Timestamp()), e.Name(), e.Value(), e.Suffix())
 	}
 }
